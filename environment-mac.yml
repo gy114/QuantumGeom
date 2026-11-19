@@ -1,0 +1,45 @@
+name: quantumgeom-mac
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  # Core Python
+  - python=3.12
+  - make
+  - pip
+  - setuptools
+  - wheel
+
+  # C/C++ toolchain pieces for macOS
+  # Note: Do NOT install Conda's clang/clangxx on macOS. Use Apple Clang (/usr/bin/clang++).
+  - llvm-openmp     # OpenMP runtime (required for Apple Clang parallelization)
+
+
+  # Build helpers (Python-side)
+  - cmake          # handy to have inside the env; CLion may still use system cmake
+  - ninja          # optional, for faster CMake builds
+  - pkg-config     # optional, useful for debugging configs
+
+  # Geometry / math libs
+  - cgal>6.0
+  - eigen
+  - gmp
+  - mpfr
+  - armadillo
+  - vtk
+
+  # pybind11 + scientific stack
+  - pybind11
+  - numpy
+  - scipy
+
+  # Testing
+  - pytest
+
+  # Docs / plotting (optional but nice to keep aligned with HPC env)
+  - sphinx
+  - sphinx_rtd_theme
+  - breathe
+  - matplotlib-base
+  - pillow

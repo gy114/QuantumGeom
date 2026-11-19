@@ -1,0 +1,94 @@
+name: Build and publish documentation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Miniconda (CMake + Docs)
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          environment-file: environment-cmake.yml
+          activate-environment: quantumgeom-cmake
+          use-mamba: true
+          auto-activate-base: false
+
+      - name: Configure and build
+        run: |
+          PREFIX=$(conda run -n quantumgeom-cmake python -c "import sys; print(sys.prefix)")
+          conda run -n quantumgeom-cmake cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_PREFIX_PATH="$PREFIX" \
+            -DPython3_EXECUTABLE="$PREFIX/bin/python" \
+            -DQUANTUMGEOM_BUILD_TESTS=ON
+          conda run --no-capture-output -n quantumgeom-cmake cmake --build build --parallel 2
+
+      - name: Install quantumGeom into conda environment
+        run: |
+          conda run -n quantumgeom-cmake cmake --install build
+          conda run -n quantumgeom-cmake python -c "import quantumGeom; print(quantumGeom.__version__)"
+
+      - name: Run native and Python tests
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+        run: |
+          conda run --no-capture-output -n quantumgeom-cmake ctest --test-dir build --output-on-failure
+          conda run --no-capture-output -n quantumgeom-cmake python -m pytest -q tests
+
+      - name: Build documentation with Sphinx
+        run: conda run -n quantumgeom-cmake sphinx-build -W -b html -d docs/_build/doctrees docs docs/_build/html
+
+      - name: Upload built documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation
+          path: docs/_build/html
+          if-no-files-found: error
+
+  deploy:
+    if: >-
+      toJSON(github.event.repository.private) == 'false' &&
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    needs: build
+    runs-on: ubuntu-22.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
+
+    steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Download built documentation
+        uses: actions/download-artifact@v4
+        with:
+          name: documentation
+          path: html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: html
+
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

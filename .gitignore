@@ -1,0 +1,10 @@
+/build/
+/docs/_build/
+/.venv/
+/venv/
+/.pytest_cache/
+__pycache__/
+/data/
+/BrillouinZone.vtu
+/weyl_hall_conductivity.csv
+/weyl_hall_conductivity.png

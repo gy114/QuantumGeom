@@ -1,0 +1,59 @@
+name: quantumgeom-cmake
+channels:
+  - conda-forge
+
+dependencies:
+
+  # -------------------------------
+  # Core build tools
+  # -------------------------------
+  - python =3.11
+  - cmake
+  - make
+  - pip
+
+  # Compiler toolchain (Linux & macOS)
+  - c-compiler
+  - cxx-compiler
+  - llvm-openmp          # OpenMP runtime
+
+  # -------------------------------
+  # C++ libraries used by QuantumGeom
+  # -------------------------------
+  - armadillo >=12
+  - eigen
+  - hdf5
+
+  # Boost stack — match what meta.yaml uses
+  - libboost =1.86
+  - libboost-headers =1.86
+  - libboost-devel =1.86
+
+  # CGAL (let it pick a version compatible with Boost 1.86)
+  - cgal
+
+  # -------------------------------
+  # Visualization / VTK
+  # -------------------------------
+  - vtk
+  - qt-main      # optional; remove if you don't need Qt widgets
+
+  # -------------------------------
+  # Python bindings
+  # -------------------------------
+  - pybind11
+
+  # -------------------------------
+  # Optional: math / plotting / docs / tests
+  # -------------------------------
+  - numpy
+  - matplotlib-base
+  - pillow
+  - pytest
+  - sphinx
+  - sphinx_rtd_theme
+  - breathe
+
+
+
+# Build and installation instructions are in docs/Installation.rst.
