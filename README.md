@@ -41,15 +41,8 @@ using the model's analytic Berry curvature.
 
 ## Documentation
 
-See the [user guide](docs/user_guide.rst) and
-[Python API documentation sources](docs/api/index.rst). Build the HTML
-documentation with the extension installed in the Conda environment.
-
-```bash
-sphinx-build -W -b html docs docs/_build/html
-```
-
-Open `docs/_build/html/index.html` in a browser.
+The [QuantumGeom documentation](https://gy114.github.io/QuantumGeom/) covers
+installation, Hall conductivity workflows, and the Python API.
 
 ## License
 
